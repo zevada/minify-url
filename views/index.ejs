@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MinifyUrl</title>
+</head>
+<body>
+    <p>
+        <form method="post" action="/url">
+            <input type="text" name="longUrl" id="longUrl">
+            <button type="submit">Minify</button>
+        </form>
+    </p>
+    <% if (miniUrl != null) { %>
+    <p>
+        <%= miniUrl %>        
+    </p>            
+    <% } %>
+</body>
+</html>

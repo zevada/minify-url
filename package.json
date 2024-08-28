@@ -1,0 +1,27 @@
+{
+  "name": "minify-url",
+  "version": "1.0.0",
+  "description": "A simple URL shortening service",
+  "main": "app.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon app.j"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zevada/minify-url.git"
+  },
+  "author": "Zevada",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/zevada/minify-url/issues"
+  },
+  "homepage": "https://github.com/zevada/minify-url#readme",
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "ejs": "^3.1.10",
+    "express": "^4.19.2",
+    "nodemon": "^3.1.4"
+  }
+}
