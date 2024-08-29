@@ -1,6 +1,7 @@
 import express from 'express';
 import path from 'path';
 import bodyParser from 'body-parser';
+import base62 from 'base62';
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: false }))
@@ -23,14 +24,16 @@ app.get('/', (req, res, next) => {
 
 app.post('/url', (req, res, next) => {
     db[dbSize] = req.body.longUrl;
+    const shortPath = base62.encode(dbSize);
     res.render(createViewAbsolutePath('index'), {
-        miniUrl: dbSize
+        miniUrl: `https://localhost:3000/${shortPath}`
     });
     dbSize++;
 });
 
-app.get('/:shortUrl', (req, res, next) => {
-    const shortUrl = req.params.shortUrl;
+app.get('/:shortPath', (req, res, next) => {
+    const shortPath = req.params.shortPath;
+    const shortId = base62.decode(shortPath);
     if (db[shortUrl] == null) {
         res.render(createViewAbsolutePath('notFound'));
     } else {
