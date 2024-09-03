@@ -1,16 +1,35 @@
-const db = {}; //TODO: Use real database
+import pg from 'pg'
+import base62 from 'base62';
+
+var client = new pg.Pool({
+    user: 'postgres',
+    host: 'postgres',
+    database: 'postgres',
+    password: 'password',
+    port: 5432,
+});
 
 export class MiniUrl {
-    constructor(miniUrl, longUrl) {
-        this.miniUrl = miniUrl;
+    constructor(longUrl) {
+        this.id = null; //TODO
+        this.miniUrl = null;
         this.longUrl = longUrl;
     }
 
-    save() {
-        db[this.miniUrl] = this.origUrl;
+    async save() {
+        const query = `INSERT INTO url (long_url) VALUES ('${this.longUrl}') RETURNING id;`;
+        const result = await client.query(query);
+        this.id = result.rows[0].id
+        this.miniUrl = base62.encode(result.rows[0].id);
     }
 
-    static fetchLongUrl(miniUrl) {
-        return db[miniUrl];
+    static async fetchLongUrl(miniUrl) {
+        const id = base62.decode(miniUrl);
+        const result = await client.query(`SELECT long_url FROM url WHERE id=${id}`);
+        const rs = result.rowCount === 0 ? null : new MiniUrl(result.rows[0].long_url);    
+        
+        
+        console.log(rs);
+        return rs;
     }
 }

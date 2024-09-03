@@ -1,15 +1,12 @@
 import express from 'express';
 import path from 'path';
 import bodyParser from 'body-parser';
-import base62 from 'base62';
 import { MiniUrl } from './models/miniUrl.js';
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: false }))
 app.set('view engine', 'ejs');
 app.set('views', 'views');
-
-let dbSize = 0;
 
 const createViewAbsolutePath = (filename) => {
     return path.join(import.meta.dirname, 'views', filename);
@@ -21,29 +18,36 @@ app.get('/', (req, res, next) => {
     });
 });
 
-app.post('/url', (req, res, next) => {
-    const miniUrl = base62.encode(dbSize);
+app.post('/url', async (req, res, next) => {
     const longUrl = req.body.longUrl;
-    
-    const urlRecord = new MiniUrl(miniUrl, longUrl);
-    urlRecord.save();
-    dbSize++;
-
+    const urlRecord = new MiniUrl(longUrl);
+    await urlRecord.save();
     res.render(createViewAbsolutePath('index'), {
-        miniUrl: `https://localhost:3000/${miniUrl}`
+        miniUrl: `https://localhost:3000/${urlRecord.miniUrl}`
     });
 });
 
 app.get('/:shortPath', (req, res, next) => {
+    console.log(req.url);
     const miniUrl = req.params.shortPath;
-    const urlRecord = MiniUrl.fetchLongUrl(miniUrl);
-    if (urlRecord == null) {
-        res.render(createViewAbsolutePath('index'), { 
-            miniUrl: null
-        });
-    } else {
-        res.redirect(urlRecord.longUrl);
-    }
+    
+    MiniUrl
+        .fetchLongUrl(miniUrl)
+        .then((result) => {
+            console.log(JSON.stringify(result));
+            if (result == null) {
+                console.log('Is null?')
+                res.render(createViewAbsolutePath('index'), { 
+                    miniUrl: null
+                });
+            } else {
+                res.redirect(result.longUrl);
+            }
+        }, (err) => {
+            res.render(createViewAbsolutePath('index'), { 
+                miniUrl: null
+            });
+        });    
 });
 
 app.listen(3000);

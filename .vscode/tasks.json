@@ -20,20 +20,55 @@
 			"platform": "node"
 		},
 		{
+			"label": "docker-run-postgres",
+			"type": "docker-run",
+			"dockerRun": {
+				"image": "postgres:latest",
+				"containerName": "postgres",
+				"ports": [
+					{
+						"containerPort": 5432,
+						"hostPort": 5432
+					}
+				],
+				"env": {
+					"POSTGRES_USER": "postgres",
+					"POSTGRES_PASSWORD": "password",
+					"POSTGRES_DB": "postgres",
+				},
+				"volumes": [
+					{
+						"localPath": "${workspaceFolder}/init-database.sh",
+						"containerPath": "/docker-entrypoint-initdb.d/init-database.sh"
+					}
+				],
+				"network": "debug"
+			}
+		},		
+		{
 			"type": "docker-run",
 			"label": "docker-run: debug",
 			"dependsOn": [
-				"docker-build"
+				"docker-build",
+				"docker-run-postgres"
 			],
 			"dockerRun": {
+				"ports": [
+					{
+						"containerPort": 3000,
+						"hostPort": 3000
+					}
+				],
+				"containerName": "minifyurl",
 				"env": {
 					"DEBUG": "*",
 					"NODE_ENV": "development"
-				}
+				},
+				"network": "debug"
 			},
 			"node": {
-				"enableDebugging": true
-			}
+				"enableDebugging": true,
+			},
 		}
 	]
 }
